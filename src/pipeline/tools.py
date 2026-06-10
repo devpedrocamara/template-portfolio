@@ -1,6 +1,5 @@
 from pydantic import BaseModel, Field
 
-# Dicionário de Capítulos chaveados simulando mapeamento direto para indexação ágil do livro técnico
 CHAPTERS_MAP = {
     "1": "What Is The Shell? - Introdução ao prompt, bash e comandos básicos de navegação inicial.",
     "2": "Navigation - Comandos essenciais para navegar em diretórios: pwd, cd, ls.",
@@ -13,13 +12,11 @@ class LookupChapterInput(BaseModel):
     chapter_number: str = Field(description="O número do capítulo em string (ex: '1', '2', '3') para buscar o resumo descritivo.")
 
 def lookup_chapter(chapter_number: str) -> str:
-    """Ferramenta de navegação dirigida para retornar informações essenciais sobre capítulos do livro."""
     chapter_clean = str(chapter_number).strip()
     if chapter_clean in CHAPTERS_MAP:
         return f"Capítulo {chapter_clean}: {CHAPTERS_MAP[chapter_clean]}"
     return f"Erro: Capítulo {chapter_clean} não mapeado no sumário dinâmico. Escolha de 1 a 5."
 
-# Definição do Schema JSON da Tool para o Modelo do Gemini
 tool_schema = {
     "type": "function",
     "function": {

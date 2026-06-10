@@ -6,11 +6,9 @@ import chromadb
 from chromadb.utils.embedding_functions import OpenAIEmbeddingFunction
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-# Configurações de diretório obtidas do notebook de RAG
 CORPUS_DIR = Path("data/corpus")
 PERSIST_DIR = "data/chroma"
 
-# Instanciação do cliente e embeddings nativos do Gemini expostos via OpenAI-compatible API
 def get_embedding_function():
     api_key = os.getenv("GEMINI_API_KEY")
     return OpenAIEmbeddingFunction(
@@ -20,12 +18,10 @@ def get_embedding_function():
     )
 
 def ingest_and_index():
-    """Lê o PDF, quebra em chunks de 800/100 e armazena no ChromaDB"""
-    # 1. Ingestão de PDFs
     docs = []
     for pdf_path in CORPUS_DIR.glob("*.pdf"):
         reader = PdfReader(pdf_path)
-        for page_idx, page in enumerate(reader.pages):
+        for page_idx, page in enumerate(reader.pages[:30]): 
             text = page.extract_text() or ""
             if text.strip():
                 docs.append({
@@ -38,7 +34,6 @@ def ingest_and_index():
         print("Nenhum documento encontrado em data/corpus/")
         return
 
-    # 2. Chunking Recursivo (800 caracteres, overlap 100)
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=800,
         chunk_overlap=100,
@@ -56,7 +51,6 @@ def ingest_and_index():
                 "chunk_idx": i
             })
 
-    # 3. Embedding e Indexação no Chroma
     chroma_client = chromadb.PersistentClient(path=PERSIST_DIR)
     try:
         chroma_client.delete_collection("linux_book")
@@ -68,19 +62,36 @@ def ingest_and_index():
         embedding_function=get_embedding_function(),
     )
     
-    # Adição em lotes de 50 para mitigar rate-limits da API gratuita
-    BATCH = 50
+    BATCH = 20
+    
+    print(f"Iniciando indexação de {len(chunks)} chunks...")
+    
     for start in range(0, len(chunks), BATCH):
         lote = chunks[start : start + BATCH]
-        collection.add(
-            ids=[c["id"] for c in lote],
-            documents=[c["text"] for c in lote],
-            metadatas=[
-                {"source": c["source"], "page": c["page"], "chunk_idx": c["chunk_idx"]}
-                for c in lote
-            ],
-        )
-        time.sleep(1) # Pausa curta resiliente entre lotes
+        
+        sucesso = False
+        while not sucesso:
+            try:
+                collection.add(
+                    ids=[c["id"] for c in lote],
+                    documents=[c["text"] for c in lote],
+                    metadatas=[
+                        {"source": c["source"], "page": c["page"], "chunk_idx": c["chunk_idx"]}
+                        for c in lote
+                    ],
+                )
+                print(f"Indexados chunks {start} até {start + len(lote)}...")
+                sucesso = True
+                time.sleep(2)
+                
+            except Exception as e:
+                if "429" in str(e) or "Quota" in str(e):
+                    print("⚠️ Limite de 100 requisições/min atingido.")
+                    print("😴 Pausando por 60 segundos para a API resetar a cota...")
+                    time.sleep(60)
+                else:
+                    raise e
+                    
     print(f"Sucesso! {collection.count()} chunks indexados com sucesso.")
 
 def retrieve(query: str, k: int = 5) -> list[dict]:
