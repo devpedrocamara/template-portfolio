@@ -13,7 +13,7 @@ def run_orchestrator(user_query: str):
     
     messages = [{"role": "user", "content": user_query}]
     response = client.chat.completions.create(
-        model="gemini-2.5-flash-lite",
+        model="gemini-3.1-flash-lite",
         messages=messages,
         tools=[tool_schema],
         tool_choice="auto",
@@ -37,7 +37,7 @@ def run_orchestrator(user_query: str):
                 })
                 
                 final_response = client.chat.completions.create(
-                    model="gemini-2.5-flash-lite",
+                    model="gemini-3.1-flash-lite",
                     messages=messages,
                     temperature=0.0,
                     stream=True
@@ -60,7 +60,7 @@ PERGUNTA: {user_query}
 RESPOSTA:"""
 
     final_response = client.chat.completions.create(
-        model="gemini-2.5-flash-lite",
+        model="gemini-3.1-flash-lite",
         messages=[{"role": "user", "content": RAG_PROMPT}],
         temperature=0.0,
         stream=True

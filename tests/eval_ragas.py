@@ -59,8 +59,8 @@ def run_evaluation():
         "ground_truth": respostas_esperadas
     })
 
-    llm_ragas = ChatGoogleGenerativeAI(model="gemini-2.5-flash-lite", google_api_key=gemini_key)
-    embeddings_ragas = GoogleGenerativeAIEmbeddings(model="models/text-embedding-004", google_api_key=gemini_key)
+    llm_ragas = ChatGoogleGenerativeAI(model="gemini-3.1-flash-lite", google_api_key=gemini_key)
+    embeddings_ragas = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-2", google_api_key=gemini_key)
 
     print("Calculando métricas...")
     resultados = evaluate(
