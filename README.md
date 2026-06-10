@@ -28,6 +28,12 @@ A pipeline de avaliação foi automatizada utilizando o framework RAGAS para gar
 - **Faithfulness (Fidelidade):** Garantia de ausência de alucinações (nota obtida: 0.75).
 - **Context Precision:** Relevância dos chunks recuperados do banco vetorial.
 
+## ⚠️ Limites e Próximos Passos (Trabalhos Futuros)
+Embora a arquitetura seja funcional, identificamos algumas limitações durante o desenvolvimento e avaliação:
+- **Limitações de Quota de API:** Durante o cálculo automatizado com RAGAS, o uso do tier gratuito (free tier) da API do Google gerou restrições de *Rate Limit* e falhas de requisição, impossibilitando o cálculo da métrica de *Answer Relevancy*.
+- **Fidelidade do Modelo:** A métrica de *Faithfulness* indicou que o LLM pontualmente mistura seu conhecimento interno com o contexto fornecido. Como melhoria futura, o RAG_PROMPT deve ser parametrizado de forma ainda mais restritiva.
+- **Precisão de Recuperação:** A métrica de *Context Precision* demonstra espaço para melhoria. O próximo passo lógico na arquitetura seria a implementação de um modelo de **Reranking** para reordenar os chunks do ChromaDB antes de enviá-los ao LLM, diminuindo o ruído.
+
 *Os resultados detalhados das baterias de testes estão disponíveis no arquivo `ragas_results.csv` na raiz do projeto.*
 
 ## ⚙️ Como Executar Localmente
