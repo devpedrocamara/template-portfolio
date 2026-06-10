@@ -1,5 +1,9 @@
 # 🐧 Assistente Técnico CLI: The Linux Command Line
+
+🚀 **Acesse a aplicação online:** [linuxtechnicalassistant.streamlit.app](https://linuxtechnicalassistant.streamlit.app/)
+
 ![Demo da Aplicação](imgs/print.png)
+
 Este repositório contém a entrega final do desafio de orquestração de LLMs e Tool-use desenvolvido para a **Residência em TIC 44 (CTE-IA)** (SiDi / SOFTEX Campinas).
 
 O projeto é um assistente de IA focado no ecossistema Linux, capaz de responder perguntas complexas consultando a documentação oficial do livro *"The Linux Command Line"*, acionar ferramentas determinísticas e otimizar custos operacionais.
